@@ -6,7 +6,7 @@ terraform {
   
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
@@ -22,9 +22,37 @@ provider "aws" {
   default_tags {
     tags = {
       Environment = "Learning"
-      ManagedBy   = "Terraform"
-      Project     = "SAA-C03-Prep"
-      Topic       = "IAM"
+      ManagedBy = "Terraform"
+      Project = "SAA-C03-Prep"
+      Topic = "IAM"
     }
   }
+}
+
+# ============================================
+# TASK 1: IAM USERS
+# ============================================
+
+# Create developer users
+resource "aws_iam_user" "developers" {
+    for_each = toset(var.developer_users)
+
+    name = each.value
+    path = "/developers/"
+
+    tags = {
+        Role = "Developers"
+    }
+}
+
+# Create admin users
+resource "aws_iam_user" "admins" {
+    for_each = toset(var.admin_users)
+
+    name = each.value
+    path = "/admins/"
+
+    tags = {
+        Role = "Administrator"
+    }
 }
