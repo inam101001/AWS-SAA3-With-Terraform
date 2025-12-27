@@ -78,3 +78,29 @@ resource aws_iam_group "readonly" {
     name = "readonly-users"
     path = "/"
 }
+
+# ============================================
+# TASK 3: GROUP MEMBERSHIP
+# ============================================
+
+# Add developer users to developers group
+resource "aws_iam_user_group_membership" "developers" {
+    for_each = toset(var.developer_users)
+
+    user = aws_iam_user.developers[each.value].name
+
+    groups = [
+        aws_iam_group.developers.name
+    ]
+}
+
+# Add admin users to administrators group
+resource "aws_iam_user_group_membership" "admins" {
+    for_each = toset(var.admin_users)
+
+    user = aws_iam_user.admins[each.value].name
+
+    groups = [
+        aws_iam_group.administrators.name
+    ]
+}
