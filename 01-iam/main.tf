@@ -56,3 +56,25 @@ resource "aws_iam_user" "admins" {
         Role = "Administrator"
     }
 }
+
+# ============================================
+# TASK 2: IAM GROUPS
+# ============================================
+
+# Developers Group
+resource "aws_iam_group" "developers" {
+    name = "developers"
+    path = "/"
+}
+
+# Administrators Group
+resource aws_iam_group "administrators" {
+    name = "administrators"
+    path = "/"
+}
+
+# Read-Only Users Group
+resource aws_iam_group "readonly" {
+    name = "readonly-users"
+    path = "/"
+}
