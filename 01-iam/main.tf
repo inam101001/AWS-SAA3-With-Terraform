@@ -175,3 +175,31 @@ resource "aws_iam_policy" "ec2_readonly" {
     Purpose = "Learning-EC2-ReadOnly"
   }
 }
+
+# ============================================
+# TASK 5: ATTACH POLICIES TO GROUPS
+# ============================================
+
+# Attach AWS Managed Policy to Administrators Group
+resource "aws_iam_group_policy_attachment" "admin_access" {
+  group      = aws_iam_group.administrators.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+# Attach AWS Managed Policy to ReadOnly Group
+resource "aws_iam_group_policy_attachment" "readonly_access" {
+  group      = aws_iam_group.readonly.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+
+# Attach Custom S3 Policy to Developers Group
+resource "aws_iam_group_policy_attachment" "developers_s3" {
+  group      = aws_iam_group.developers.name
+  policy_arn = aws_iam_policy.s3_specific_bucket_read.arn
+}
+
+# Attach Custom EC2 Policy to Developers Group
+resource "aws_iam_group_policy_attachment" "developers_ec2" {
+  group      = aws_iam_group.developers.name
+  policy_arn = aws_iam_policy.ec2_readonly.arn
+}

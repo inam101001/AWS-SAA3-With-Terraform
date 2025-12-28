@@ -28,3 +28,29 @@ output "custom_policies" {
     ec2_readonly   = aws_iam_policy.ec2_readonly.arn
   }
 }
+
+# Output policy attachments summary
+output "group_policy_attachments" {
+  description = "Summary of which policies are attached to which groups"
+  value = {
+    administrators = {
+      group = aws_iam_group.administrators.name
+      policies = [
+        "AdministratorAccess (AWS Managed)"
+      ]
+    }
+    developers = {
+      group = aws_iam_group.developers.name
+      policies = [
+        aws_iam_policy.s3_specific_bucket_read.name,
+        aws_iam_policy.ec2_readonly.name
+      ]
+    }
+    readonly = {
+      group = aws_iam_group.readonly.name
+      policies = [
+        "ReadOnlyAccess (AWS Managed)"
+      ]
+    }
+  }
+}
