@@ -18,8 +18,8 @@ variable "admin_users" {
 
 variable "trusted_account_id" {
   description = "AWS Account ID that can assume the cross-account role"
-  type = string
-  default = "123456789012"
+  type        = string
+  default     = "123456789012"
 
   validation {
     condition     = can(regex("^[0-9]{12}$", var.trusted_account_id))

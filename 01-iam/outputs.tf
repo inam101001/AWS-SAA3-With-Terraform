@@ -54,3 +54,13 @@ output "group_policy_attachments" {
     }
   }
 }
+
+# Output instance profile name (for EC2 usage)
+output "ec2_instance_profile" {
+  description = "Instance profile to attach to EC2 instances for S3 access"
+  value = {
+    name = aws_iam_instance_profile.ec2_s3_profile.name
+    arn  = aws_iam_instance_profile.ec2_s3_profile.arn
+    role = aws_iam_instance_profile.ec2_s3_profile.role
+  }
+}

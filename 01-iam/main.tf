@@ -212,7 +212,7 @@ resource "aws_iam_group_policy_attachment" "developers_ec2" {
 resource "aws_iam_role" "ec2_s3_access" {
   name        = "EC2-S3-Access-Role"
   description = "Allows EC2 instances to access S3 buckets"
-  
+
   # TRUST POLICY - Who can assume this role?
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -234,7 +234,7 @@ resource "aws_iam_role" "ec2_s3_access" {
 
 # Attach permission policy to EC2 role
 resource "aws_iam_role_policy_attachment" "ec2-s3-readonly" {
-  role = aws_iam_role.ec2_s3_access.name
+  role       = aws_iam_role.ec2_s3_access.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
@@ -242,7 +242,7 @@ resource "aws_iam_role_policy_attachment" "ec2-s3-readonly" {
 resource "aws_iam_role" "lambda_execution" {
   name        = "Lambda-Basic-Execution-Role"
   description = "Allows Lambda functions to write logs to CloudWatch"
-  
+
   # TRUST POLICY - Lambda service can assume this
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -272,7 +272,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_iam_role" "cross_account_access" {
   name        = "Cross-Account-Access-Role"
   description = "Allows users from another AWS account to assume this role"
-  
+
   # TRUST POLICY - Another AWS account can assume this
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -301,4 +301,18 @@ resource "aws_iam_role" "cross_account_access" {
 resource "aws_iam_role_policy_attachment" "cross_account_readonly" {
   role       = aws_iam_role.cross_account_access.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+
+# ============================================
+# TASK 7: INSTANCE PROFILE (Wrapper for EC2 Role)
+# ============================================
+
+# Instance Profile for EC2 instances
+resource "aws_iam_instance_profile" "ec2_s3_profile" {
+  name = "EC2-S3-Instance-Profile"
+  role = aws_iam_role.ec2_s3_access.name
+
+  tags = {
+    Purpose = "Attach-EC2-Role-To-Instances"
+  }
 }
