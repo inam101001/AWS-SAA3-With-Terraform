@@ -64,3 +64,15 @@ output "ec2_instance_profile" {
     role = aws_iam_instance_profile.ec2_s3_profile.role
   }
 }
+
+# Output password policy settings
+output "account_password_policy" {
+  description = "Account-wide password policy settings"
+  value = {
+    minimum_length   = aws_iam_account_password_policy.strict_policy.minimum_password_length
+    require_symbols  = aws_iam_account_password_policy.strict_policy.require_symbols
+    require_numbers  = aws_iam_account_password_policy.strict_policy.require_numbers
+    max_password_age = aws_iam_account_password_policy.strict_policy.max_password_age
+    reuse_prevention = aws_iam_account_password_policy.strict_policy.password_reuse_prevention
+  }
+}
