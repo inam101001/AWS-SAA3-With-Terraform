@@ -203,3 +203,102 @@ resource "aws_iam_group_policy_attachment" "developers_ec2" {
   group      = aws_iam_group.developers.name
   policy_arn = aws_iam_policy.ec2_readonly.arn
 }
+
+# ============================================
+# TASK 6: IAM ROLES
+# ============================================
+
+# Role 1: EC2 Role for S3 Access
+resource "aws_iam_role" "ec2_s3_access" {
+  name        = "EC2-S3-Access-Role"
+  description = "Allows EC2 instances to access S3 buckets"
+  
+  # TRUST POLICY - Who can assume this role?
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Purpose = "EC2-Instance-S3-Access"
+  }
+}
+
+# Attach permission policy to EC2 role
+resource "aws_iam_role_policy_attachment" "ec2-s3-readonly" {
+  role = aws_iam_role.ec2_s3_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+# Role 2: Lambda Execution Role
+resource "aws_iam_role" "lambda_execution" {
+  name        = "Lambda-Basic-Execution-Role"
+  description = "Allows Lambda functions to write logs to CloudWatch"
+  
+  # TRUST POLICY - Lambda service can assume this
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Purpose = "Lambda-Execution"
+  }
+}
+
+# Attach AWS managed Lambda execution policy
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Role 3: Cross-Account Access Role (Advanced)
+resource "aws_iam_role" "cross_account_access" {
+  name        = "Cross-Account-Access-Role"
+  description = "Allows users from another AWS account to assume this role"
+  
+  # TRUST POLICY - Another AWS account can assume this
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${var.trusted_account_id}:root"
+        }
+        Action = "sts:AssumeRole"
+        Condition = {
+          StringEquals = {
+            "sts:ExternalId" = "my-unique-external-id-12345"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Purpose = "Cross-Account-Access"
+  }
+}
+
+# Attach read-only policy to cross-account role
+resource "aws_iam_role_policy_attachment" "cross_account_readonly" {
+  role       = aws_iam_role.cross_account_access.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}

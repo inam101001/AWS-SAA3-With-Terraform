@@ -15,3 +15,14 @@ variable "admin_users" {
   type        = list(string)
   default     = ["admin-john"]
 }
+
+variable "trusted_account_id" {
+  description = "AWS Account ID that can assume the cross-account role"
+  type = string
+  default = "123456789012"
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.trusted_account_id))
+    error_message = "Account ID must be exactly 12 digits."
+  }
+}
